@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
-import './index.css' // Tailwind CSS를 위한 CSS 파일
+// './index.css' import를 제거했습니다.
 
 ReactDOM.createRoot(document.getElementById('root')).render(
    <React.StrictMode>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 
-// --- Mock API: 실제로는 별도의 백엔드 서버와 통신해야 합니다 ---
+// --- Mock API 데이터 ---
 const mockUserDatabase = [
    { id: 1, phone: '010-1234-5678', email: 'testuser@example.com', name: '홍길동' },
    { id: 2, phone: '010-9876-5432', email: 'gemini@google.com', name: '제미니' },
@@ -13,22 +13,87 @@ const maskEmail = (email) => {
    return `${local[0]}${'*'.repeat(local.length - 1)}@${domain}`
 }
 
+// --- 스타일 객체 (CSS-in-JS) ---
+const styles = {
+   container: {
+      backgroundColor: '#f1f5f9',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '100vh',
+      fontFamily: 'sans-serif',
+   },
+   card: {
+      width: '100%',
+      maxWidth: '448px',
+      padding: '32px',
+      backgroundColor: 'white',
+      borderRadius: '16px',
+      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+   },
+   h1: {
+      fontSize: '30px',
+      fontWeight: 'bold',
+      textAlign: 'center',
+      color: '#1e293b',
+      marginBottom: '1rem',
+   },
+   p: {
+      marginBottom: '2rem',
+      textAlign: 'center',
+   },
+   input: {
+      width: '100%',
+      padding: '12px 16px',
+      marginTop: '4px',
+      color: '#334155',
+      backgroundColor: '#f8fafc',
+      border: '1px solid #cbd5e1',
+      borderRadius: '8px',
+      boxSizing: 'border-box',
+   },
+   button: {
+      width: '100%',
+      padding: '12px',
+      fontWeight: '600',
+      color: 'white',
+      backgroundColor: '#4338ca',
+      borderRadius: '8px',
+      border: 'none',
+      cursor: 'pointer',
+      marginTop: '1rem',
+   },
+   buttonSecondary: {
+      width: '50%',
+      padding: '12px',
+      fontWeight: '600',
+      color: '#334155',
+      backgroundColor: '#e2e8f0',
+      borderRadius: '8px',
+      border: 'none',
+      cursor: 'pointer',
+   },
+   buttonGroup: {
+      display: 'flex',
+      gap: '8px',
+      marginTop: '1rem',
+   },
+}
+
 // --- 페이지 컴포넌트들 ---
 
-// 1. 홈페이지 컴포넌트
 function HomePage() {
    return (
-      <div className="text-center">
-         <h1 className="text-4xl font-bold mb-4">Vite + React 프로젝트</h1>
-         <p className="mb-8">아래 링크를 눌러 비밀번호 찾기 페이지로 이동하세요.</p>
+      <div style={styles.card}>
+         <h1 style={styles.h1}>Vite + React 프로젝트</h1>
+         <p style={styles.p}>아래 링크를 눌러 비밀번호 찾기 페이지로 이동하세요.</p>
          <Link to="/find-password">
-            <button className="px-6 py-3 font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-all">비밀번호 찾으러 가기</button>
+            <button style={styles.button}>비밀번호 찾으러 가기</button>
          </Link>
       </div>
    )
 }
 
-// 2. 비밀번호 찾기 페이지 컴포넌트
 function FindPasswordPage() {
    const [step, setStep] = useState(1)
    const [phone, setPhone] = useState('')
@@ -37,12 +102,10 @@ function FindPasswordPage() {
    const [isLoading, setIsLoading] = useState(false)
    const [message, setMessage] = useState({ type: '', text: '' })
 
-   const handlePhoneSubmit = async (e) => {
+   const handlePhoneSubmit = (e) => {
       e.preventDefault()
       setIsLoading(true)
       setMessage({ type: '', text: '' })
-
-      // API 호출 시뮬레이션
       setTimeout(() => {
          const user = mockUserDatabase.find((u) => u.phone === phone)
          if (user) {
@@ -56,12 +119,10 @@ function FindPasswordPage() {
       }, 1000)
    }
 
-   const handleEmailSubmit = async (e) => {
+   const handleEmailSubmit = (e) => {
       e.preventDefault()
       setIsLoading(true)
       setMessage({ type: '', text: '' })
-
-      // API 호출 시뮬레이션
       setTimeout(() => {
          const user = mockUserDatabase.find((u) => u.phone === phone)
          if (user && user.email.toLowerCase() === email.toLowerCase()) {
@@ -92,49 +153,31 @@ function FindPasswordPage() {
    }
 
    return (
-      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-2xl shadow-lg">
-         <h1 className="text-3xl font-bold text-center text-slate-800">비밀번호 찾기</h1>
+      <div style={styles.card}>
+         <h1 style={styles.h1}>비밀번호 찾기</h1>
          <div style={messageStyle}>{message.text}</div>
 
          {step === 1 && (
-            <form onSubmit={handlePhoneSubmit} className="space-y-4">
-               <input
-                  id="phone"
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="010-1234-5678"
-                  className="w-full px-4 py-3 mt-1 text-slate-700 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                  disabled={isLoading}
-               />
-               <button type="submit" className="w-full py-3 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-slate-400" disabled={isLoading}>
+            <form onSubmit={handlePhoneSubmit}>
+               <input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="010-1234-5678" style={styles.input} required disabled={isLoading} />
+               <button type="submit" style={styles.button} disabled={isLoading}>
                   {isLoading ? '확인 중...' : '이메일 찾기'}
                </button>
             </form>
          )}
 
          {step === 2 && (
-            <form onSubmit={handleEmailSubmit} className="space-y-4">
-               <div className="p-4 bg-slate-50 rounded-lg text-center">
-                  <p className="text-slate-600">아래 이메일이 맞는지 확인해주세요.</p>
-                  <p className="text-lg font-bold text-slate-800 my-2">{maskedEmail}</p>
+            <form onSubmit={handleEmailSubmit}>
+               <div style={{ padding: '16px', backgroundColor: '#f8fafc', borderRadius: '8px', textAlign: 'center', marginBottom: '1rem' }}>
+                  <p>아래 이메일이 맞는지 확인해주세요.</p>
+                  <p style={{ fontSize: '18px', fontWeight: 'bold', margin: '8px 0' }}>{maskedEmail}</p>
                </div>
-               <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="전체 이메일 주소 입력"
-                  className="w-full px-4 py-3 mt-1 text-slate-700 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                  disabled={isLoading}
-               />
-               <div className="flex space-x-2">
-                  <button type="button" onClick={resetProcess} className="w-1/2 py-3 font-semibold text-slate-700 bg-slate-200 rounded-lg hover:bg-slate-300" disabled={isLoading}>
+               <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="전체 이메일 주소 입력" style={styles.input} required disabled={isLoading} />
+               <div style={styles.buttonGroup}>
+                  <button type="button" onClick={resetProcess} style={styles.buttonSecondary} disabled={isLoading}>
                      뒤로
                   </button>
-                  <button type="submit" className="w-1/2 py-3 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-slate-400" disabled={isLoading}>
+                  <button type="submit" style={{ ...styles.button, width: '50%', marginTop: 0 }} disabled={isLoading}>
                      {isLoading ? '전송 중...' : '재설정 메일 받기'}
                   </button>
                </div>
@@ -142,9 +185,9 @@ function FindPasswordPage() {
          )}
 
          {step === 3 && (
-            <div className="text-center space-y-4">
-               <p className="text-slate-700">성공적으로 요청이 완료되었습니다.</p>
-               <button onClick={resetProcess} className="w-full py-3 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+            <div style={{ textAlign: 'center' }}>
+               <p>성공적으로 요청이 완료되었습니다.</p>
+               <button onClick={resetProcess} style={styles.button}>
                   처음으로 돌아가기
                </button>
             </div>
@@ -157,7 +200,7 @@ function FindPasswordPage() {
 export default function App() {
    return (
       <BrowserRouter>
-         <div className="bg-slate-100 flex items-center justify-center min-h-screen font-sans">
+         <div style={styles.container}>
             <Routes>
                <Route path="/" element={<HomePage />} />
                <Route path="/find-password" element={<FindPasswordPage />} />
